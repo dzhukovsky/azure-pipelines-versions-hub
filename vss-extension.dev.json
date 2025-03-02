@@ -1,0 +1,6 @@
+{
+  "id": "open-security-toolkit-dev",
+  "name": "Open Security Toolkit (Dev)",
+  "baseUri": "http://localhost:3000",
+  "public": false
+}

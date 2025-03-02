@@ -1,0 +1,45 @@
+{
+  "name": "open-security-toolkit",
+  "type": "module",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "packageManager": "yarn@4.7.0",
+  "workspaces": [
+    "tasks/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "package": "run build && tfx extension create --manifests vss-extension.json",
+    "package:dev": "run package -- --overrides-file vss-extension.dev.json"
+  },
+  "dependencies": {
+    "azure-devops-extension-api": "^4.246.0",
+    "azure-devops-extension-sdk": "^4.0.2",
+    "azure-devops-ui": "^2.251.0",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/react": "^16.8.1",
+    "@types/react-dom": "^16.8.1",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "esbuild": "^0.25.0",
+    "esbuild-plugin-copy": "^2.1.1",
+    "eslint": "^9.19.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "sass-embedded": "^1.85.0",
+    "tfx-cli": "^0.20.0",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.22.0",
+    "vite": "^6.1.0"
+  }
+}

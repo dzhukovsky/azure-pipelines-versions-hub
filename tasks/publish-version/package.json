@@ -1,0 +1,13 @@
+{
+  "name": "publish-version",
+  "type": "commonjs",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "azure-pipelines-task-lib": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.0",
+    "@types/q": "^1.5.8"
+  }
+}

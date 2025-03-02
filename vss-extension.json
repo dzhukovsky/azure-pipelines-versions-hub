@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json.schemastore.org/vss-extension",
+  "id": "versions-hub",
+  "name": "Versions Hub",
+  "manifestVersion": 1,
+  "version": "1.0.0",
+  "publisher": "dzhukovsky",
+  "public": false,
+  "author": "Dmitry Zhukovsky",
+  "description": "Azure DevOps Extension",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "demands": ["api-version/3.0"],
+  "icons": {
+    "default": "icon.png"
+  },
+  "scopes": [],
+  "categories": ["Azure Pipelines"],
+  "tags": ["Preview"],
+  "content": {
+    "details": {
+      "path": "README.md"
+    },
+    "license": {
+      "path": "LICENSE"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/dzhukovsky/azure-pipelines-versions-hub"
+  },
+  "contributions": [
+    {
+      "id": "versions-hub",
+      "type": "ms.vss-web.hub",
+      "targets": ["ms.vss-build-web.build-release-hub-group"],
+      "properties": {
+        "name": "Versions",
+        "uri": "index.html",
+        "iconName": "Rocket"
+      }
+    },
+    {
+      "id": "publish-version-task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "type": "ms.vss-distributed-task.task",
+      "properties": {
+        "name": "tasks/publish-version"
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "dist",
+      "packagePath": "/",
+      "addressable": true
+    },
+    {
+      "path": "tasks",
+      "addressable": false
+    }
+  ]
+}

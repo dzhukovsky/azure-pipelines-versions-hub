@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/vsts-task-lib/master/tasks.schema.json",
+  "id": "2a715f11-89ac-47bc-8b15-b4c1242c23d7",
+  "name": "PublishVersion",
+  "friendlyName": "Publish Version",
+  "description": "TODO: Description",
+  "author": "dzhukovsky",
+  "helpMarkDown": "[More Information](https://github.com/dzhukovsky/azure-pipelines-versions-hub)",
+  "category": "Build",
+  "visibility": ["Build"],
+  "demands": [],
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "2.0.0",
+  "instanceNameFormat": "Publish Version",
+  "inputs": [
+    {
+      "name": "testParam",
+      "type": "string",
+      "label": "Test Param",
+      "helpMarkDown": "TODO: Help",
+      "defaultValue": "",
+      "required": true
+    }
+  ],
+  "execution": {
+    "Node20_1": {
+      "target": "index.js"
+    }
+  }
+}
