@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
+    "azure-devops-node-api": "^14.1.0",
     "azure-pipelines-task-lib": "^5.0.0"
   },
   "devDependencies": {

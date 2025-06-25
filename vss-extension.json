@@ -3,7 +3,7 @@
   "id": "versions-hub",
   "name": "Versions Hub",
   "manifestVersion": 1,
-  "version": "1.0.0",
+  "version": "1.0.25",
   "publisher": "dzhukovsky",
   "public": false,
   "author": "Dmitry Zhukovsky",
@@ -13,7 +13,7 @@
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "demands": ["api-version/3.0"],
+  "demands": ["api-version/7.2"],
   "icons": {
     "default": "icon.png"
   },
@@ -50,6 +50,14 @@
       "properties": {
         "name": "tasks/publish-version"
       }
+    },
+    {
+      "id": "publish-version-task-decorator",
+      "type": "ms.azure-pipelines.pipeline-decorator",
+      "targets": ["ms.azure-pipelines-agent-job.post-job-tasks"],
+      "properties": {
+        "template": "tasks/publish-version/decorator.yml"
+      }
     }
   ],
   "files": [
@@ -61,6 +69,11 @@
     {
       "path": "tasks",
       "addressable": false
+    },
+    {
+      "path": "tasks/publish-version/decorator.yml",
+      "addressable": true,
+      "contentType": "text/plain"
     }
   ]
 }

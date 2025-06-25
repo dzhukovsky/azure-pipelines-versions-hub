@@ -12,20 +12,11 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 0
+    "Patch": 25
   },
-  "minimumAgentVersion": "2.0.0",
+  "minimumAgentVersion": "4.0.0",
   "instanceNameFormat": "Publish Version",
-  "inputs": [
-    {
-      "name": "testParam",
-      "type": "string",
-      "label": "Test Param",
-      "helpMarkDown": "TODO: Help",
-      "defaultValue": "",
-      "required": true
-    }
-  ],
+  "inputs": [],
   "execution": {
     "Node20_1": {
       "target": "index.js"

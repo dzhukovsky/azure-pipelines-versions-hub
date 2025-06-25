@@ -2,10 +2,24 @@ import react from "@vitejs/plugin-react-swc";
 import { build } from "esbuild";
 import { copy } from "esbuild-plugin-copy";
 import { defineConfig } from "vite";
+import babel from "vite-plugin-babel";
+import commonjs from "vite-plugin-commonjs";
 
 export default defineConfig({
   base: "./",
-  plugins: [react(), buildTasks()],
+  plugins: [
+    babel({
+      babelConfig: {
+        plugins: ["transform-amd-to-commonjs"],
+      },
+    }),
+    commonjs(),
+    react(),
+    buildTasks(),
+  ],
+  build: {
+    target: "esnext",
+  },
 });
 
 function buildTasks() {
@@ -19,13 +33,13 @@ function buildTasks() {
         outdir: "dist",
         outbase: ".",
         format: "cjs",
-        minify: true,
+        minify: false,
         logLevel: "info",
         plugins: [
           copy({
             assets: [
               {
-                from: "tasks/**/*.json",
+                from: "tasks/**/*.{json,yml}",
                 to: "tasks",
               },
             ],

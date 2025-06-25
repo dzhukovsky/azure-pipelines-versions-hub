@@ -1,0 +1,3 @@
+steps:
+- task: PublishVersion@1
+  displayName: 'Post-job: Publish Version'
