@@ -2,21 +2,10 @@ import react from "@vitejs/plugin-react-swc";
 import { build } from "esbuild";
 import { copy } from "esbuild-plugin-copy";
 import { defineConfig } from "vite";
-import babel from "vite-plugin-babel";
-import commonjs from "vite-plugin-commonjs";
 
 export default defineConfig({
   base: "./",
-  plugins: [
-    babel({
-      babelConfig: {
-        plugins: ["transform-amd-to-commonjs"],
-      },
-    }),
-    commonjs(),
-    react(),
-    buildTasks(),
-  ],
+  plugins: [react(), buildTasks()],
   build: {
     target: "esnext",
   },

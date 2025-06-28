@@ -20,20 +20,17 @@
     "package:dev": "run package -- --overrides-file vss-extension.dev.json"
   },
   "dependencies": {
-    "azure-devops-extension-api": "^4.254.0",
+    "azure-devops-extension-api": "https://github.com/dzhukovsky/azure-devops-extension-api.git#add-esm-support",
     "azure-devops-extension-sdk": "^4.0.2",
     "azure-devops-ui": "^2.257.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.4",
     "@eslint/js": "^9.29.0",
-    "@types/babel__core": "^7",
     "@types/react": "^16.8.1",
     "@types/react-dom": "^16.8.1",
     "@vitejs/plugin-react-swc": "^3.10.2",
-    "babel-plugin-transform-amd-to-commonjs": "^1.6.0",
     "esbuild": "^0.25.5",
     "esbuild-plugin-copy": "^2.1.1",
     "eslint": "^9.29.0",
@@ -43,8 +40,6 @@
     "tfx-cli": "0.21.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.0",
-    "vite": "^7.0.0",
-    "vite-plugin-babel": "^1.3.1",
-    "vite-plugin-commonjs": "^0.10.4"
+    "vite": "^7.0.0"
   }
 }

@@ -27,9 +27,11 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
   },
   "include": [
-    "src"
+    "src",
+    "tasks/**/index.ts",
   ]
 }

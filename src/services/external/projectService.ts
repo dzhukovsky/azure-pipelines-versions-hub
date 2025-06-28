@@ -5,7 +5,7 @@ import {
   IProjectInfo,
 } from "azure-devops-extension-api";
 
-export async function getProject(): Promise<IProjectInfo> {
+export async function getCurrentProject(): Promise<IProjectInfo> {
   await SDK.ready();
 
   const projectService = await SDK.getService<IProjectPageService>(

@@ -23,9 +23,11 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
   },
   "include": [
-    "vite.config.ts"
+    "vite.config.ts",
+    "tasks/**/index.ts",
   ]
 }

@@ -3,7 +3,7 @@
   "id": "versions-hub",
   "name": "Versions Hub",
   "manifestVersion": 1,
-  "version": "1.0.25",
+  "version": "1.0.31",
   "publisher": "dzhukovsky",
   "public": false,
   "author": "Dmitry Zhukovsky",
@@ -17,7 +17,7 @@
   "icons": {
     "default": "icon.png"
   },
-  "scopes": [],
+  "scopes": ["vso.build"],
   "categories": ["Azure Pipelines"],
   "tags": ["Preview"],
   "content": {

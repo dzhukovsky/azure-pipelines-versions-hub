@@ -3,7 +3,7 @@ import {
   CommonServiceIds,
   IExtensionDataService,
 } from "azure-devops-extension-api";
-import { getProject } from "./projectService";
+import { getCurrentProject } from "./projectService";
 
 export const getDataManager = async () => {
   await SDK.ready();
@@ -19,7 +19,7 @@ export const getDataManager = async () => {
 };
 
 export const getValue = async <T>(key: string, defaultValue: T) => {
-  const project = await getProject();
+  const project = await getCurrentProject();
   const dataManager = await getDataManager();
 
   const result = await dataManager.getValue<T>(`${project.id}-${key}`);
@@ -27,17 +27,17 @@ export const getValue = async <T>(key: string, defaultValue: T) => {
 };
 
 export const setValue = async <T>(key: string, value: T) => {
-  const project = await getProject();
+  const project = await getCurrentProject();
   const dataManager = await getDataManager();
   await dataManager.setValue<T>(`${project.id}-${key}`, value);
 };
 
 export async function getDocuments<T>(collectionName: string): Promise<T[]> {
-  const project = await getProject();
+  const project = await getCurrentProject();
   const dataManager = await getDataManager();
 
   const collections = await dataManager.queryCollectionsByName([
-    `${project.id}-${collectionName}`,
+    `${project.id}:${collectionName}`,
   ]);
 
   return collections.flatMap((x) => x.documents);

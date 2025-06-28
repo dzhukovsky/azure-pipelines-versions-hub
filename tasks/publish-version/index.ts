@@ -2,36 +2,49 @@ import * as tl from "azure-pipelines-task-lib/task";
 import * as azdo from "azure-devops-node-api";
 import config from "../../vss-extension.json";
 import configDev from "../../vss-extension.dev.json";
+import {
+  IEnvironmentMetadataDocument,
+  pipelineMetadataCollectionNameFactory,
+} from "../../shared/metadataContract";
 
 async function run() {
+  const environmentId = tl.getVariable("Environment.Id");
+  if (!environmentId) {
+    return;
+  }
+
   const token = tl.getVariable("System.AccessToken")!;
   const orgUrl = tl.getVariable("System.CollectionUri")!;
   const projectId = tl.getVariable("System.TeamProjectId")!;
 
-  const definitionId = tl.getVariable("System.DefinitionId")!;
-  const buildId = tl.getVariable("Build.BuildId")!;
+  const definitionId = +tl.getVariable("System.DefinitionId")!;
+  const buildId = +tl.getVariable("Build.BuildId")!;
   const buildNumber = tl.getVariable("Build.BuildNumber")!;
-  const stageName = tl.getVariable("System.StageName")!;
+  const resourceId = +tl.getVariable("Environment.ResourceId")! || undefined;
 
   const connection = azdo.WebApi.createWithBearerToken(orgUrl, token);
   const api = await connection.getExtensionManagementApi();
 
-  const collection = `${projectId}:pipeline-metadata:${definitionId}`;
-  const documentId = stageName.toLowerCase();
+  const documentId = environmentId;
+  const collectionName = pipelineMetadataCollectionNameFactory.construct(
+    projectId,
+    definitionId
+  );
 
-  const document: { __etag: string } = await api.getDocumentByName(
+  const document: IEnvironmentMetadataDocument = await api.getDocumentByName(
     config.publisher,
     configDev.id,
     "Default",
     "Current",
-    collection,
+    collectionName,
     documentId
   );
 
-  const data = {
+  const data: IEnvironmentMetadataDocument = {
     id: documentId,
     buildId,
     buildNumber,
+    resourceId,
     __etag: document?.__etag,
   };
 
@@ -41,7 +54,7 @@ async function run() {
     configDev.id,
     "Default",
     "Current",
-    collection
+    collectionName
   );
 }
 
