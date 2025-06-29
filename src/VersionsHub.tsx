@@ -37,6 +37,7 @@ const selectedTabId = new ObservableValue<string>("home");
 const filterToggled = new ObservableValue<boolean>(false);
 const filter = new Filter();
 const dropdownSelection = new DropdownMultiSelection();
+const buildNumberSelection = new DropdownMultiSelection();
 
 const headerCommands: IHeaderCommandBarItem[] = [
   {
@@ -54,9 +55,11 @@ export const VersionsHub = () => {
   const [pipelinesMetadata, setPipelinesMetadata] = React.useState<{
     environments: EnvironmentInstance[];
     items: IVersionItem[];
+    buildNumbers: string[];
   }>({
     environments: [],
     items: [],
+    buildNumbers: [],
   });
 
   React.useEffect(() => {
@@ -93,9 +96,18 @@ export const VersionsHub = () => {
         ),
       }));
 
+      const buildNumbers = [
+        ...new Set(
+          pipelinesMetadata.flatMap((item) =>
+            item.environments.map((env) => env.buildNumber)
+          )
+        ),
+      ].sort((a, b) => a.localeCompare(b));
+
       setPipelinesMetadata({
         environments,
-        items,
+        items: items,
+        buildNumbers,
       });
     };
 
@@ -130,6 +142,13 @@ export const VersionsHub = () => {
               onDismissClicked={onFilterBarDismissClicked}
             >
               <KeywordFilterBarItem filterItemKey="keyword" />
+              <DropdownFilterBarItem
+                filterItemKey="buildNumber"
+                filter={filter}
+                items={pipelinesMetadata.buildNumbers}
+                selection={buildNumberSelection}
+                placeholder="Build Number"
+              />
               <DropdownFilterBarItem
                 filterItemKey="status"
                 filter={filter}

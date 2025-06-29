@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { Card } from "azure-devops-ui/Card";
@@ -75,11 +74,11 @@ export function getStatusIndicatorData(status: string): IStatusIndicatorData {
   return indicatorData;
 }
 
-export const VersionsTable: React.FC<IVersionsTableProps> = ({
+export const VersionsTable = ({
   filter,
   environments,
   items,
-}) => {
+}: IVersionsTableProps) => {
   const [sortedItems, setSortedItems] = useState<IVersionItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<IVersionItem[]>([]);
   const [filtering, setFiltering] = useState(false);
@@ -91,17 +90,26 @@ export const VersionsTable: React.FC<IVersionsTableProps> = ({
           .getFilterItemValue<string>("keyword")
           ?.toLocaleLowerCase();
         const statuses = filter.getFilterItemValue<PipelineStatus[]>("status");
+        const buildNumbers = filter.getFilterItemValue<string[]>("buildNumber");
+
         return items.filter((item) => {
           const nameMatch =
             !filterText || item.name.toLocaleLowerCase().includes(filterText);
 
           return Object.values(item.environments).some((env) => {
-            const buildNumberMatch =
+            const buildNumberTextMatch =
               !filterText ||
               env.buildNumber.toLocaleLowerCase().includes(filterText);
             const statusMatch =
               !statuses?.length || statuses.includes(env.status);
-            return (buildNumberMatch || nameMatch) && statusMatch;
+            const buildNumberMatch =
+              !buildNumbers?.length || buildNumbers.includes(env.buildNumber);
+
+            return (
+              (buildNumberTextMatch || nameMatch) &&
+              statusMatch &&
+              buildNumberMatch
+            );
           });
         });
       } else {
@@ -234,24 +242,27 @@ function renderVersionColumn(
   tableItem: IVersionItem
 ): JSX.Element {
   const item = tableItem.environments[tableColumn.id];
-  const statusData = getStatusIndicatorData(item.status);
+
   return (
     <SimpleTableCell
       columnIndex={columnIndex}
       tableColumn={tableColumn}
       key={"col-" + columnIndex}
-      contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
     >
-      <Status
-        {...statusData.statusProps}
-        className="icon-large-margin"
-        size={StatusSize.m}
-      />
-      <div className="flex-row scroll-hidden wrap-text">
-        <Tooltip text={item.buildNumber}>
-          <span>{item.buildNumber}</span>
-        </Tooltip>
-      </div>
+      {!!item && (
+        <>
+          <Status
+            {...getStatusIndicatorData(item.status).statusProps}
+            className="icon-large-margin"
+            size={StatusSize.m}
+          />
+          <div className="flex-row scroll-hidden wrap-text">
+            <Tooltip text={item.buildNumber}>
+              <span>{item.buildNumber}</span>
+            </Tooltip>
+          </div>
+        </>
+      )}
     </SimpleTableCell>
   );
 }

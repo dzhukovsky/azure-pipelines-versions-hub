@@ -53,7 +53,7 @@ export async function getPipelinesMetadata(
     return {
       projectId,
       definitionId: +definitionId,
-      environments: collection.documents
+      environments: (collection.documents ?? [])
         .filter((doc: IEnvironmentMetadataDocument) =>
           environmentsByCollectionNames[collection.collectionName].includes(
             +doc.id
