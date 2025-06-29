@@ -18,6 +18,7 @@ import {
 import { Tooltip } from "azure-devops-ui/TooltipEx";
 import { IFilter, FILTER_CHANGE_EVENT } from "azure-devops-ui/Utilities/Filter";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
+import { EnvironmentInstance } from "src/services/external/Environment/Environments";
 
 export enum PipelineStatus {
   running = "running",
@@ -27,27 +28,29 @@ export enum PipelineStatus {
 }
 
 interface IVersionsTableProps {
+  environments: EnvironmentInstance[];
+  items: IVersionItem[];
   filter: IFilter;
 }
 
-interface IPipelineItem {
+export interface IVersionItemEnvironments {
+  [id: string]: {
+    status: PipelineStatus;
+    buildId: number;
+    buildNumber: string;
+  };
+}
+
+export interface IVersionItem {
   name: string;
-  status: PipelineStatus;
+  definitionId: number;
+  environments: IVersionItemEnvironments;
 }
 
 interface IStatusIndicatorData {
   statusProps: IStatusProps;
   label: string;
 }
-
-const pipelineItems: IPipelineItem[] = [
-  { name: "enterprise-distributed-service", status: PipelineStatus.running },
-  { name: "microservice-architecture", status: PipelineStatus.succeeded },
-  { name: "mobile-ios-app", status: PipelineStatus.succeeded },
-  { name: "node-package", status: PipelineStatus.succeeded },
-  { name: "parallel-stages", status: PipelineStatus.failed },
-  { name: "simple-web-app", status: PipelineStatus.warning },
-];
 
 export function getStatusIndicatorData(status: string): IStatusIndicatorData {
   status = (status || "").toLowerCase();
@@ -72,26 +75,34 @@ export function getStatusIndicatorData(status: string): IStatusIndicatorData {
   return indicatorData;
 }
 
-export const VersionsTable: React.FC<IVersionsTableProps> = ({ filter }) => {
-  const [sortedItems, setSortedItems] = useState<IPipelineItem[]>([
-    ...pipelineItems,
-  ]);
-  const [filteredItems, setFilteredItems] = useState<IPipelineItem[]>([
-    ...pipelineItems,
-  ]);
+export const VersionsTable: React.FC<IVersionsTableProps> = ({
+  filter,
+  environments,
+  items,
+}) => {
+  const [sortedItems, setSortedItems] = useState<IVersionItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<IVersionItem[]>([]);
   const [filtering, setFiltering] = useState(false);
 
   const filterItems = useCallback(
-    (items: IPipelineItem[]) => {
+    (items: IVersionItem[]) => {
       if (filter.hasChangesToReset()) {
-        const filterText = filter.getFilterItemValue<string>("keyword");
+        const filterText = filter
+          .getFilterItemValue<string>("keyword")
+          ?.toLocaleLowerCase();
         const statuses = filter.getFilterItemValue<PipelineStatus[]>("status");
         return items.filter((item) => {
-          let ok = true;
-          if (filterText) ok = item.name.includes(filterText);
-          if (ok && statuses?.length)
-            ok = statuses.some((s) => s === item.status);
-          return ok;
+          const nameMatch =
+            !filterText || item.name.toLocaleLowerCase().includes(filterText);
+
+          return Object.values(item.environments).some((env) => {
+            const buildNumberMatch =
+              !filterText ||
+              env.buildNumber.toLocaleLowerCase().includes(filterText);
+            const statusMatch =
+              !statuses?.length || statuses.includes(env.status);
+            return (buildNumberMatch || nameMatch) && statusMatch;
+          });
         });
       } else {
         return [...items];
@@ -111,24 +122,37 @@ export const VersionsTable: React.FC<IVersionsTableProps> = ({ filter }) => {
     return () => filter.unsubscribe(onFilterChanged, FILTER_CHANGE_EVENT);
   }, [filter, onFilterChanged]);
 
-  const columns: ITableColumn<IPipelineItem>[] = useMemo(
+  useEffect(() => {
+    setSortedItems([...items]);
+    setFilteredItems([...items]);
+  }, [items]);
+
+  const columns: (ITableColumn<IVersionItem> & {
+    sortFunction: (a: IVersionItem, b: IVersionItem) => number;
+  })[] = useMemo(
     () => [
       {
         id: "name",
         name: "Pipeline",
         readonly: true,
         renderCell: renderNameColumn,
+        sortFunction: (a: IVersionItem, b: IVersionItem) =>
+          a.name.localeCompare(b.name),
         sortProps: {
           ariaLabelAscending: "Sorted A to Z",
           ariaLabelDescending: "Sorted Z to A",
         },
         width: new ObservableValue(-10),
       },
-      ...["dev", "test", "prod"].map((id) => ({
-        id,
-        name: id.charAt(0).toUpperCase() + id.slice(1),
+      ...environments.map((environment) => ({
+        id: environment.id.toString(),
+        name: environment.name,
         readonly: true,
         renderCell: renderVersionColumn,
+        sortFunction: (a: IVersionItem, b: IVersionItem) =>
+          a.environments[environment.id]?.buildNumber.localeCompare(
+            b.environments[environment.id]?.buildNumber
+          ),
         sortProps: {
           ariaLabelAscending: "Sorted A to Z",
           ariaLabelDescending: "Sorted Z to A",
@@ -136,22 +160,17 @@ export const VersionsTable: React.FC<IVersionsTableProps> = ({ filter }) => {
         width: new ObservableValue(-10),
       })),
     ],
-    []
+    [environments]
   );
 
   const sortFunctions = useMemo(
-    () =>
-      columns.map((column) => {
-        const key = column.id as keyof IPipelineItem;
-        return (a: IPipelineItem, b: IPipelineItem) =>
-          a[key]?.localeCompare(b[key]);
-      }),
+    () => columns.map((column) => column.sortFunction),
     [columns]
   );
 
   const sortingBehavior = useMemo(
     () =>
-      new ColumnSorting<IPipelineItem>((columnIndex, proposedSortOrder) => {
+      new ColumnSorting<IVersionItem>((columnIndex, proposedSortOrder) => {
         const newSorted = sortItems(
           columnIndex,
           proposedSortOrder,
@@ -174,10 +193,10 @@ export const VersionsTable: React.FC<IVersionsTableProps> = ({ filter }) => {
       className="flex-grow bolt-card-no-vertical-padding"
       contentProps={{ contentPadding: false }}
     >
-      <Table<Partial<IPipelineItem>>
+      <Table<Partial<IVersionItem>>
         behaviors={[sortingBehavior]}
         columns={columns}
-        itemProvider={new ArrayItemProvider<IPipelineItem>(filteredItems)}
+        itemProvider={new ArrayItemProvider<IVersionItem>(filteredItems)}
         showLines
         onSelect={(_, data) => console.log("Selected Row - " + data.index)}
         onActivate={(_, row) => console.log("Activated Row - " + row.index)}
@@ -189,8 +208,8 @@ export const VersionsTable: React.FC<IVersionsTableProps> = ({ filter }) => {
 function renderNameColumn(
   _rowIndex: number,
   columnIndex: number,
-  tableColumn: ITableColumn<IPipelineItem>,
-  tableItem: IPipelineItem
+  tableColumn: ITableColumn<IVersionItem>,
+  tableItem: IVersionItem
 ): JSX.Element {
   return (
     <SimpleTableCell
@@ -211,10 +230,11 @@ function renderNameColumn(
 function renderVersionColumn(
   _rowIndex: number,
   columnIndex: number,
-  tableColumn: ITableColumn<IPipelineItem>,
-  tableItem: IPipelineItem
+  tableColumn: ITableColumn<IVersionItem>,
+  tableItem: IVersionItem
 ): JSX.Element {
-  const statusData = getStatusIndicatorData(tableItem.status);
+  const item = tableItem.environments[tableColumn.id];
+  const statusData = getStatusIndicatorData(item.status);
   return (
     <SimpleTableCell
       columnIndex={columnIndex}
@@ -228,8 +248,8 @@ function renderVersionColumn(
         size={StatusSize.m}
       />
       <div className="flex-row scroll-hidden wrap-text">
-        <Tooltip text={tableItem.name}>
-          <span>{tableItem.name}</span>
+        <Tooltip text={item.buildNumber}>
+          <span>{item.buildNumber}</span>
         </Tooltip>
       </div>
     </SimpleTableCell>
